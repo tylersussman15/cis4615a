@@ -7,7 +7,11 @@ public class Operation {
       try {
         // Do operations
       } finally {
-        reader.close();
+        try {
+          reader.close();
+        } catch (IOException ie) {
+          // Forward to handler
+        }
         // ... Other cleanup code ...
       }
     } catch (IOException x) {
