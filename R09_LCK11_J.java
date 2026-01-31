@@ -19,24 +19,28 @@ final class Book {
     return dateDue;
   }
 }
-// Client
-public class BookWrapper {
+public final class BookWrapper {
   private final Book book;
+  private final Object lock = new Object();
  
   BookWrapper(Book book) {
     this.book = book;
   }
  
   public void issue(int days) {
-    book.issue(days);
+    synchronized(lock) {
+      book.issue(days);
+    }
   }
  
   public Calendar getDueDate() {
-    return book.getDueDate();
+    synchronized(lock) {
+      return book.getDueDate();
+    }
   }
  
   public void renew() {
-    synchronized(book) {
+    synchronized(lock) {
       if (book.getDueDate().before(Calendar.getInstance())) {
         throw new IllegalStateException("Book overdue");
       } else {
