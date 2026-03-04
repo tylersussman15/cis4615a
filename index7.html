@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Pokemon Team Builder</title>
+</head>
+<body>
+
+<label for="pokeInput">Name or ID:</label>
+<input id="pokeInput" type="text">
+<button onclick="findPokemon()">Find</button>
+
+<div>
+  <img id="pokeImg" alt="Pokemon sprite">
+</div>
+
+<div>
+  <audio id="pokeAudio" controls></audio>
+</div>
+
+<div>
+  <select id="move1"></select>
+  <select id="move2"></select>
+  <select id="move3"></select>
+  <select id="move4"></select>
+</div>
+
+<button onclick="addToTeam()">Add to Team</button>
+
+<hr>
+
+<div id="teamBox"></div>
+
+<script>
+
+const API = "https://pokeapi.co/api/v2/pokemon/";
+
+const input = document.getElementById("pokeInput");
+const img = document.getElementById("pokeImg");
+const audio = document.getElementById("pokeAudio");
+
+const move1 = document.getElementById("move1");
+const move2 = document.getElementById("move2");
+const move3 = document.getElementById("move3");
+const move4 = document.getElementById("move4");
+
+const teamBox = document.getElementById("teamBox");
+
+let currentPokemon = null;
+
+function fillMoves(dropdown, moves){
+  dropdown.innerHTML = "";
+
+  for(let m of moves){
+    let opt = document.createElement("option");
+    opt.value = m.move.name;
+    opt.innerText = m.move.name;
+    dropdown.appendChild(opt);
+  }
+}
+
+function showPokemon(data){
+
+  currentPokemon = data;
+
+  img.src = data.sprites.front_default;
+
+  if(data.cries && data.cries.latest){
+    audio.src = data.cries.latest;
+  }
+
+  let moves = data.moves;
+
+  fillMoves(move1, moves);
+  fillMoves(move2, moves);
+  fillMoves(move3, moves);
+  fillMoves(move4, moves);
+
+}
+
+function findPokemon(){
+
+  let q = input.value;
+
+  fetch(API + q)
+  .then(function(response){
+    return response.json();
+  })
+  .then(function(data){
+    showPokemon(data);
+  });
+
+}
+
+function addToTeam(){
+
+  if(!currentPokemon) return;
+
+  let entry = document.createElement("div");
+
+  let name = document.createElement("div");
+  name.innerText = currentPokemon.name;
+  entry.appendChild(name);
+
+  let sprite = document.createElement("img");
+  sprite.src = currentPokemon.sprites.front_default;
+  sprite.width = 80;
+  entry.appendChild(sprite);
+
+  let ul = document.createElement("ul");
+
+  let moves = [move1.value, move2.value, move3.value, move4.value];
+
+  for(let m of moves){
+    let li = document.createElement("li");
+    li.innerText = m;
+    ul.appendChild(li);
+  }
+
+  entry.appendChild(ul);
+
+  teamBox.appendChild(entry);
+
+}
+
+</script>
+
+</body>
+</html>
